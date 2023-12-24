@@ -8,7 +8,7 @@ export function GetRandomStatusLabel(status: keyof StatusLabel): string {
   const list = statusLabel[status];
   const randomItem = list[Math.floor(Math.random() * list.length)];
 
-  return randomItem;
+  return randomItem || "";
 }
 
 const statusLabel: StatusLabel = {
