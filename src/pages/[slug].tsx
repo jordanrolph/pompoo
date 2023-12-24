@@ -14,7 +14,7 @@ export default function BathingSite({
   return (
     <>
       <Head>
-        <title>Pompoo - {bathingSite.name}</title>
+        <title>{`"Pompoo - "${bathingSite.name}`}</title>
         <meta
           name="description"
           content={`Check Southern Water's sewage releases to ${bathingSite.name}`}
@@ -22,9 +22,9 @@ export default function BathingSite({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex h-screen min-h-[600px] flex-col items-center justify-between bg-black p-4 text-center">
+      <main className="flex h-[calc(100dvh)] min-h-[600px] flex-col items-center justify-between bg-black p-4 text-center">
         <Link
-          className="mt-2 inline-flex items-center gap-3 rounded-lg border border-amber-50 px-3 py-1 text-white hover:border-dashed"
+          className="mt-2 inline-flex items-center gap-3 rounded-lg border border-zinc-400 px-3 py-1 text-white hover:border-white"
           href="/beaches"
         >
           {/* Hamburger SVG */}
@@ -55,7 +55,7 @@ export default function BathingSite({
           </div>
         </Link>
 
-        <div className="flex max-w-96 flex-col items-center">
+        <div className="my-4 flex max-w-96 grow flex-col items-center justify-center">
           <Image
             alt="Poo emoji"
             height={120}
@@ -69,18 +69,23 @@ export default function BathingSite({
             {bathingSite.status.message}
           </p>
         </div>
-
         <section className="flex flex-wrap gap-6 text-lg  text-white lg:gap-10">
           <div className="flex flex-col gap-1">
-            <h2 className="text-sm text-amber-100">Last Week</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              Last Week
+            </h2>
             <p className="font-medium">{bathingSite.stats.days7}</p>
           </div>
           <div className="flex flex-col gap-1">
-            <h2 className=" text-sm text-amber-100">Last Month</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              Last Month
+            </h2>
             <p className="font-medium">{bathingSite.stats.days30}</p>
           </div>
           <div className="flex flex-col gap-1">
-            <h2 className="text-sm text-amber-100">All time</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              All time
+            </h2>
             <p className="font-medium">{bathingSite.stats.allTime}</p>
           </div>
         </section>

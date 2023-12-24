@@ -24,7 +24,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex h-screen min-h-[460px] flex-col items-center justify-between bg-black p-4 text-center">
+      <main className="flex h-[calc(100dvh)] min-h-[460px] flex-col items-center justify-between bg-black p-4 text-center">
         <Image
           src="/pompoo-logo.png"
           alt="Pompoo Logo"
@@ -58,15 +58,21 @@ export default function Home() {
         </div>
         <section className="flex flex-wrap gap-6 text-lg font-medium text-white lg:gap-10">
           <div className="flex flex-col gap-1">
-            <h2 className="text-sm text-amber-300">Releases Today</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-amber-300">
+              Releases Today
+            </h2>
             <p>{stats.today}</p>
           </div>
           <div className="flex flex-col gap-1">
-            <h2 className="text-sm text-zinc-400">Last 7 days</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              Last 7 days
+            </h2>
             <p>{stats.sevenDays}</p>
           </div>
           <div className="flex flex-col gap-1">
-            <h2 className="text-sm text-zinc-400">All time total</h2>
+            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              All time total
+            </h2>
             <p>{stats.allTime}</p>
           </div>
         </section>
