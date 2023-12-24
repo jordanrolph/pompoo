@@ -6,15 +6,71 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgres"
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// Run `npx prisma migrate dev` to create and apply migrations to the dev DB.
+model BathingSite {
+  id                Int    @id @default(autoincrement())
+  name              String @unique
+  slug              String @unique
+  swBathingSiteId   String @unique
+  swBathingSiteName String @unique
 
-    @@index([name])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  dumps DumpsOnBathingSite[]
+}
+
+model Outfall {
+  id            Int    @id @default(autoincrement())
+  name          String @unique
+  swOutfallId   String @unique
+  swOutfallName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  dumps Dump[]
+}
+
+model Dump {
+  id            Int       @id @default(autoincrement())
+  dumpStartedAt DateTime
+  dumpEndedAt   DateTime?
+  swDumpId      String    @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  outfall      Outfall              @relation(fields: [outfallId], references: [id])
+  outfallId    Int // relation scalar (used by `@relation` above)
+  bathingSites DumpsOnBathingSite[]
+}
+
+model DumpsOnBathingSite {
+  id                   Int    @id @default(autoincrement())
+  impactClassification String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  dump          Dump        @relation(fields: [dumpId], references: [id])
+  dumpId        Int // relation scalar (used by `@relation` above)
+  bathingSite   BathingSite @relation(fields: [bathingSiteId], references: [id])
+  bathingSiteId Int // relation scalar (used by `@relation` above)
+
+  @@unique(fields: [dumpId, bathingSiteId])
+}
+
+model Log {
+  id      Int    @id @default(autoincrement())
+  type    String
+  status  String
+  message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

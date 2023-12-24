@@ -6,7 +6,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: [...fontFamily.sans],
+      },
+      colors: {
+        // gold: {
+        //   50: "#fff",
+        // },
       },
     },
   },
