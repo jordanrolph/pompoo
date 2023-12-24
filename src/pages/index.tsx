@@ -5,7 +5,7 @@ import Image from "next/image";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.post.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
 
   const stats = {
     today: "9h 30m",
