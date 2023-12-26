@@ -4,13 +4,9 @@ import Image from "next/image";
 import { GetStaticPaths, InferGetStaticPropsType } from "next";
 import { db } from "~/server/db";
 
-// import { api } from "~/utils/api";
-
 export default function BathingSite({
   bathingSite,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  //   const hello = api.post.hello.useQuery({ text: "from tRPC" });
-
   return (
     <>
       <Head>
@@ -37,9 +33,9 @@ export default function BathingSite({
             <path
               d="M3 5.5H15M3 10H15M3 14.5H15"
               stroke="currentColor"
-              stroke-width="1.75"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
           <div>
@@ -94,27 +90,8 @@ export default function BathingSite({
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  // const posts = await db.post.findMany({
-  //   select: {
-  //     id: true,
-  //   },
-  // });
-  // return {
-  //   paths: posts.map((post) => ({
-  //     params: {
-  //       id: post.id,
-  //     },
-  //   })),
-  //   // https://nextjs.org/docs/pages/api-reference/functions/get-static-paths#fallback-blocking
-  //   fallback: 'blocking',
-  // };
-
-  const bathingSites = [
-    { name: "Ramsgate Western Undercliffe", slug: "some-beach" },
-    { name: "Gurnard", slug: "some-beach" },
-    { name: "Lee-On-Solent", slug: "lee-on-solent" },
-  ];
+export const getStaticPaths: GetStaticPaths = (async (context) => {
+  const bathingSites = await db.bathingSite.findMany({});
 
   return {
     paths: bathingSites.map((bathingSite) => ({
@@ -122,9 +99,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
         slug: bathingSite.slug,
       },
     })),
-    fallback: "blocking",
+    fallback: false,
   };
-};
+}) satisfies GetStaticPaths;
 
 export async function getStaticProps() {
   //   const hello = await api.post.hello.useQuery({ text: "from tRPC" });
