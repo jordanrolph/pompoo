@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { GetStaticPaths, InferGetStaticPropsType } from "next";
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { db } from "~/server/db";
 
 export default function BathingSite({
@@ -103,12 +103,16 @@ export const getStaticPaths: GetStaticPaths = (async (context) => {
   };
 }) satisfies GetStaticPaths;
 
-export async function getStaticProps() {
-  //   const hello = await api.post.hello.useQuery({ text: "from tRPC" });
+export const getStaticProps: GetStaticProps = async (context) => {
+  const bathingSite = await db.bathingSite.findUniqueOrThrow({
+    where: {
+      slug: `${context.params!.slug}`,
+    },
+  });
 
-  const bathingSite = {
-    name: "Lee-On-Solent",
-    slug: "lee-on-solent",
+  const bathingSiteData = {
+    name: bathingSite.name,
+    slug: bathingSite.slug,
     status: {
       title: "Try not to get it in your teeth.",
       message:
@@ -123,7 +127,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      bathingSite,
+      bathingSite: bathingSiteData,
     },
   };
-}
+};
