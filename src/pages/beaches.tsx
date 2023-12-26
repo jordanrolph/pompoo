@@ -1,18 +1,22 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import type {
+  InferGetStaticPropsType,
+  GetStaticProps,
+  GetStaticPropsContext,
+} from "next";
 
-// import { api } from "~/utils/api";
+import { db } from "~/server/db";
 
-export default function Beaches() {
-  //   const hello = api.post.hello.useQuery({ text: "from tRPC" });
+type BathingSite = {
+  name: string;
+  slug: string;
+};
 
-  const beaches = [
-    { name: "Ramsgate Western Undercliffe", slug: "some-beach" },
-    { name: "Gurnard", slug: "some-beach" },
-    { name: "Lee-On-Solent", slug: "lee-on-solent" },
-  ];
-
+export default function Beaches({
+  bathingSites,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
       <Head>
@@ -35,12 +39,12 @@ export default function Beaches() {
           <h1 className="mt-8 text-sm text-zinc-400">
             Choose a beach to check
           </h1>
-          {beaches.map((beach) => (
+          {bathingSites.map((bathingSite) => (
             <Link
-              href={beach.slug}
+              href={bathingSite.slug}
               className="block pt-4 text-lg font-medium text-white underline"
             >
-              {beach.name}
+              {bathingSite.name}
             </Link>
           ))}
         </div>
@@ -48,3 +52,17 @@ export default function Beaches() {
     </>
   );
 }
+
+export const getStaticProps = (async (context: GetStaticPropsContext<{}>) => {
+  const bathingSites = await db.bathingSite.findMany({
+    select: {
+      name: true,
+      slug: true,
+    },
+    orderBy: { name: "asc" },
+  });
+
+  return { props: { bathingSites } };
+}) satisfies GetStaticProps<{
+  bathingSites: BathingSite[];
+}>;

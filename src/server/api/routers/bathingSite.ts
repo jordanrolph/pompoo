@@ -2,7 +2,17 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const postRouter = createTRPCRouter({
+export const bathingSiteRouter = createTRPCRouter({
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.db.bathingSite.findMany({
+      select: {
+        name: true,
+        slug: true,
+      },
+      orderBy: { name: "desc" },
+    });
+  }),
+
   // hello: publicProcedure
   //   .input(z.object({ text: z.string() }))
   //   .query(({ input }) => {
