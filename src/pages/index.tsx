@@ -1,18 +1,20 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { GetStaticProps } from "next";
+import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
+import { db } from "~/server/db";
+import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
 
-import { api } from "~/utils/api";
-
-export default function Home() {
-  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
-
-  const stats = {
-    today: "9h 30m",
-    sevenDays: "40h",
-    allTime: "12,300h",
+interface HomeProps {
+  stats: {
+    prettyDurationToday: string;
+    prettyDurationLastSevenDays: string;
+    prettyDurationAllTime: string;
   };
+}
 
+export default function Home({ stats }: HomeProps) {
   return (
     <>
       <Head>
@@ -61,22 +63,81 @@ export default function Home() {
             <h2 className="text-xs font-medium uppercase tracking-wide text-amber-300">
               Releases Today
             </h2>
-            <p>{stats.today}</p>
+            <p>{stats.prettyDurationToday}</p>
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Last 7 days
             </h2>
-            <p>{stats.sevenDays}</p>
+            <p>{stats.prettyDurationLastSevenDays}</p>
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               All time total
             </h2>
-            <p>{stats.allTime}</p>
+            <p>{stats.prettyDurationAllTime}</p>
           </div>
         </section>
       </main>
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  // Query sum of release durations in the last 1 day for all sites.
+  const sumReleaseMinsToday = await db.dump.aggregate({
+    where: {
+      dumpEndedAt: {
+        gte: getDateForDaysAgo(1),
+      },
+    },
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Query sum of release durations in the last 7 days for all sites.
+  const sumReleaseMinsLastSevenDays = await db.dump.aggregate({
+    where: {
+      dumpEndedAt: {
+        gte: getDateForDaysAgo(7),
+      },
+    },
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Query sum of release durations for all time for all sites.
+  const sumReleaseMinsAllTime = await db.dump.aggregate({
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Format data for presentation.
+  const prettyDurationToday = minutesToPrettyFormat(
+    sumReleaseMinsToday._sum.dumpDurationMins || 0,
+    false,
+  );
+  const prettyDurationLastSevenDays = minutesToPrettyFormat(
+    sumReleaseMinsLastSevenDays._sum.dumpDurationMins || 0,
+    false,
+  );
+  const prettyDurationAllTime = minutesToPrettyFormat(
+    sumReleaseMinsAllTime._sum.dumpDurationMins || 0,
+    false,
+  );
+
+  const homeProps: HomeProps = {
+    stats: {
+      prettyDurationToday,
+      prettyDurationLastSevenDays,
+      prettyDurationAllTime,
+    },
+  };
+
+  return {
+    props: homeProps,
+  };
+};
