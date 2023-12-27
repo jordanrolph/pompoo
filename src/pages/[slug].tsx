@@ -3,10 +3,47 @@ import Link from "next/link";
 import Image from "next/image";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { db } from "~/server/db";
+import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
+import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
+import {
+  StatusLabel,
+  getPrettyStatusMessage,
+  getRandomStatusLabel,
+} from "~/utils/statusLabels";
 
-export default function BathingSite({
-  bathingSite,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+const statusImages = {
+  good: {
+    src: "/emoji-good.png",
+    alt: "OK hand emoji",
+  },
+  bad: {
+    src: "/emoji-bad.png",
+    alt: "Poo emoji",
+  },
+  meh: {
+    src: "/emoji-meh.png",
+    alt: "Shrug emoji",
+  },
+};
+
+interface BathingSiteProps {
+  bathingSite: {
+    name: string;
+    slug: string;
+    status: {
+      code: keyof StatusLabel;
+      title: string;
+      message: string;
+    };
+    stats: {
+      prettyDurationLastSevenDays: string;
+      prettyDurationLastThirtyDays: string;
+      prettyDurationAllTime: string;
+    };
+  };
+}
+
+export default function BathingSite({ bathingSite }: BathingSiteProps) {
   return (
     <>
       <Head>
@@ -53,10 +90,10 @@ export default function BathingSite({
 
         <div className="my-4 flex max-w-96 grow flex-col items-center justify-center">
           <Image
-            alt="Poo emoji"
+            src={statusImages[bathingSite.status.code].src}
+            alt={statusImages[bathingSite.status.code].alt}
             height={120}
             width={120}
-            src="/emoji-bad.png"
           />
           <h1 className="mt-4 text-3xl font-medium text-white lg:text-5xl">
             {bathingSite.status.title}
@@ -70,19 +107,25 @@ export default function BathingSite({
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Last Week
             </h2>
-            <p className="font-medium">{bathingSite.stats.days7}</p>
+            <p className="font-medium">
+              {bathingSite.stats.prettyDurationLastSevenDays}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Last Month
             </h2>
-            <p className="font-medium">{bathingSite.stats.days30}</p>
+            <p className="font-medium">
+              {bathingSite.stats.prettyDurationLastThirtyDays}
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               All time
             </h2>
-            <p className="font-medium">{bathingSite.stats.allTime}</p>
+            <p className="font-medium">
+              {bathingSite.stats.prettyDurationAllTime}
+            </p>
           </div>
         </section>
       </main>
@@ -110,24 +153,94 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
-  const bathingSiteData = {
+  // Query sum of release durations in the last 7 days for this site.
+  const sumReleaseMinsLastSevenDays = await db.dump.aggregate({
+    where: {
+      dumpEndedAt: {
+        gte: getDateForDaysAgo(7),
+      },
+      bathingSites: {
+        some: {
+          bathingSite: {
+            id: bathingSite.id,
+          },
+        },
+      },
+    },
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Query sum of release durations in the last 30 days for this site.
+  const sumReleaseMinsLastThirtyDays = await db.dump.aggregate({
+    where: {
+      dumpEndedAt: {
+        gte: getDateForDaysAgo(30),
+      },
+      bathingSites: {
+        some: {
+          bathingSite: {
+            id: bathingSite.id,
+          },
+        },
+      },
+    },
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Query sum of release durations for all time for this site.
+  const sumReleaseMinsAllTime = await db.dump.aggregate({
+    where: {
+      bathingSites: {
+        some: {
+          bathingSite: {
+            id: bathingSite.id,
+          },
+        },
+      },
+    },
+    _sum: {
+      dumpDurationMins: true,
+    },
+  });
+
+  // Format data for presentation.
+  const prettyDurationLastSevenDays = minutesToPrettyFormat(
+    sumReleaseMinsLastSevenDays._sum.dumpDurationMins || 0,
+    false,
+  );
+  const prettyDurationLastThirtyDays = minutesToPrettyFormat(
+    sumReleaseMinsLastThirtyDays._sum.dumpDurationMins || 0,
+    false,
+  );
+  const prettyDurationAllTime = minutesToPrettyFormat(
+    sumReleaseMinsAllTime._sum.dumpDurationMins || 0,
+    false,
+  );
+  const randomStatusTitle = getRandomStatusLabel("bad");
+  const prettyStatusMessage = getPrettyStatusMessage("bad", 0, 123);
+
+  const bathingSiteProps: BathingSiteProps["bathingSite"] = {
     name: bathingSite.name,
     slug: bathingSite.slug,
     status: {
-      title: "Try not to get it in your teeth.",
-      message:
-        "They’ve been firing out pure non-stop jobbies for the last 12 hours 18 mins",
+      code: "meh",
+      title: randomStatusTitle,
+      message: prettyStatusMessage,
     },
     stats: {
-      days7: "9h 30m",
-      days30: "40h",
-      allTime: "12,300h",
+      prettyDurationLastSevenDays,
+      prettyDurationLastThirtyDays,
+      prettyDurationAllTime,
     },
   };
 
   return {
     props: {
-      bathingSite: bathingSiteData,
+      bathingSite: bathingSiteProps,
     },
   };
 };

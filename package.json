@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "slugs": "tsx ./src/utils/slug.ts"
+    "script:slugs": "tsx ./src/utils/slug.ts",
+    "script:duration": "tsx ./src/utils/dumpDuration.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",
