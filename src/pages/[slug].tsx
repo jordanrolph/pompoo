@@ -15,14 +15,17 @@ import { calculateTimeDifferenceInMinutes } from "~/utils/dumpDuration";
 const statusImages = {
   good: {
     src: "/emoji-good.png",
+    blurDataUrl: "/emoji-good-blur.png",
     alt: "OK hand emoji",
   },
   bad: {
     src: "/emoji-bad.png",
+    blurDataUrl: "/emoji-good-bad.png",
     alt: "Poo emoji",
   },
   meh: {
     src: "/emoji-meh.png",
+    blurDataUrl: "/emoji-good-meh.png",
     alt: "Shrug emoji",
   },
 };
@@ -95,6 +98,8 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
             alt={statusImages[bathingSite.status.code].alt}
             height={120}
             width={120}
+            placeholder="blur"
+            blurDataURL={statusImages[bathingSite.status.code].blurDataUrl}
           />
           <h1 className="mt-4 text-3xl font-medium text-white lg:text-5xl">
             {bathingSite.status.title}
