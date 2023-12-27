@@ -10,6 +10,7 @@ import {
   getPrettyStatusMessage,
   getRandomStatusLabel,
 } from "~/utils/statusLabels";
+import { calculateTimeDifferenceInMinutes } from "~/utils/dumpDuration";
 
 const statusImages = {
   good: {
@@ -98,7 +99,7 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
           <h1 className="mt-4 text-3xl font-medium text-white lg:text-5xl">
             {bathingSite.status.title}
           </h1>
-          <p className="mt-6 text-amber-100 lg:text-lg">
+          <p className="mt-6 text-left text-amber-100 lg:text-lg">
             {bathingSite.status.message}
           </p>
         </div>
@@ -207,6 +208,51 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
+  const mostRecentDump = await db.dump.findFirst({
+    where: {
+      bathingSites: {
+        some: {
+          bathingSite: {
+            id: bathingSite.id,
+          },
+        },
+      },
+    },
+    orderBy: {
+      dumpStartedAt: "desc",
+    },
+  });
+
+  const minutesSinceLastDump: number = calculateTimeDifferenceInMinutes(
+    mostRecentDump?.dumpEndedAt || new Date(),
+    new Date(),
+  );
+
+  console.log("Most recent: ", mostRecentDump);
+  console.log("Time since", minutesSinceLastDump);
+
+  let ongoingDumpMinutesDuration: number = 0;
+  // If the end time is not set, calculate from the current time
+  ongoingDumpMinutesDuration = !!(
+    mostRecentDump?.dumpEndedAt && mostRecentDump!.dumpDurationMins
+  )
+    ? mostRecentDump!.dumpDurationMins
+    : calculateTimeDifferenceInMinutes(
+        mostRecentDump!.dumpStartedAt,
+        new Date(),
+      );
+
+  // Last dump is still ongoing or last 30 minutes = bad
+  let statusCode: keyof StatusLabel = "bad";
+  // Last dump ended more than 30 mins ago = good
+  if (minutesSinceLastDump > 30) {
+    statusCode = "meh";
+  }
+  // Last dump ended more than 24 hours ago = good
+  if (minutesSinceLastDump > 1440) {
+    statusCode = "good";
+  }
+
   // Format data for presentation.
   const prettyDurationLastSevenDays = minutesToPrettyFormat(
     sumReleaseMinsLastSevenDays._sum.dumpDurationMins || 0,
@@ -220,14 +266,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
     sumReleaseMinsAllTime._sum.dumpDurationMins || 0,
     false,
   );
-  const randomStatusTitle = getRandomStatusLabel("bad");
-  const prettyStatusMessage = getPrettyStatusMessage("bad", 0, 123);
+  const randomStatusTitle = getRandomStatusLabel(statusCode);
+  const prettyStatusMessage = getPrettyStatusMessage(
+    statusCode,
+    minutesSinceLastDump,
+    ongoingDumpMinutesDuration,
+  );
 
   const bathingSiteProps: BathingSiteProps["bathingSite"] = {
     name: bathingSite.name,
     slug: bathingSite.slug,
     status: {
-      code: "meh",
+      code: statusCode,
       title: randomStatusTitle,
       message: prettyStatusMessage,
     },

@@ -48,11 +48,14 @@ const statusLabel: StatusLabel = {
 export function getPrettyStatusMessage(
   status: keyof StatusLabel,
   minutesSinceLastDump: number,
-  minutesDuration: number,
+  ongoingDumpMinutesDuration: number,
 ): string {
   const prettyTimeSinceLastDump =
     minutesToFullHoursOrDays(minutesSinceLastDump);
-  const prettyDuration = minutesToPrettyFormat(minutesDuration, true);
+  const prettyDuration = minutesToPrettyFormat(
+    ongoingDumpMinutesDuration,
+    true,
+  );
 
   if (status === "bad") {
     return `They’ve been firing out non-stop jobbies for the past ${prettyDuration}`;
