@@ -1,12 +1,12 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
+import { type GetStaticPaths, type GetStaticProps } from "next";
 import { db } from "~/server/db";
 import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
 import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
 import {
-  StatusLabel,
+  type StatusLabel,
   getPrettyStatusMessage,
   getRandomStatusLabel,
 } from "~/utils/statusLabels";
@@ -150,7 +150,7 @@ export const getStaticPaths: GetStaticPaths = (async (context) => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const bathingSite = await db.bathingSite.findUniqueOrThrow({
     where: {
-      slug: `${context.params!.slug}`,
+      slug: context.params!.slug as string,
     },
   });
 
@@ -224,23 +224,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
   });
 
   const minutesSinceLastDump: number = calculateTimeDifferenceInMinutes(
-    mostRecentDump?.dumpEndedAt || new Date(),
+    mostRecentDump?.dumpEndedAt ?? new Date(),
     new Date(),
   );
 
   console.log("Most recent: ", mostRecentDump);
   console.log("Time since", minutesSinceLastDump);
 
-  let ongoingDumpMinutesDuration: number = 0;
   // If the end time is not set, calculate from the current time
-  ongoingDumpMinutesDuration = !!(
-    mostRecentDump?.dumpEndedAt && mostRecentDump!.dumpDurationMins
-  )
-    ? mostRecentDump!.dumpDurationMins
-    : calculateTimeDifferenceInMinutes(
-        mostRecentDump!.dumpStartedAt,
-        new Date(),
-      );
+  const ongoingDumpMinutesDuration =
+    mostRecentDump?.dumpEndedAt && mostRecentDump.dumpDurationMins
+      ? mostRecentDump.dumpDurationMins
+      : calculateTimeDifferenceInMinutes(
+          mostRecentDump!.dumpStartedAt,
+          new Date(),
+        );
 
   // Last dump is still ongoing or last 30 minutes = bad
   let statusCode: keyof StatusLabel = "bad";
@@ -255,15 +253,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   // Format data for presentation.
   const prettyDurationLastSevenDays = minutesToPrettyFormat(
-    sumReleaseMinsLastSevenDays._sum.dumpDurationMins || 0,
+    sumReleaseMinsLastSevenDays._sum.dumpDurationMins ?? 0,
     false,
   );
   const prettyDurationLastThirtyDays = minutesToPrettyFormat(
-    sumReleaseMinsLastThirtyDays._sum.dumpDurationMins || 0,
+    sumReleaseMinsLastThirtyDays._sum.dumpDurationMins ?? 0,
     false,
   );
   const prettyDurationAllTime = minutesToPrettyFormat(
-    sumReleaseMinsAllTime._sum.dumpDurationMins || 0,
+    sumReleaseMinsAllTime._sum.dumpDurationMins ?? 0,
     false,
   );
   const randomStatusTitle = getRandomStatusLabel(statusCode);

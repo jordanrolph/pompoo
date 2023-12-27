@@ -1,10 +1,10 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import type {
-  InferGetStaticPropsType,
-  GetStaticProps,
-  GetStaticPropsContext,
+import {
+  type InferGetStaticPropsType,
+  type GetStaticProps,
+  type GetStaticPropsContext,
 } from "next";
 
 import { db } from "~/server/db";
@@ -53,7 +53,7 @@ export default function Beaches({
   );
 }
 
-export const getStaticProps = (async (context: GetStaticPropsContext<{}>) => {
+export const getStaticProps = (async (context) => {
   const bathingSites = await db.bathingSite.findMany({
     select: {
       name: true,

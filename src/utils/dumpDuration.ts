@@ -51,4 +51,5 @@ async function addDumpDurationsToDB() {
   }
 }
 
-addDumpDurationsToDB();
+// Uncomment to run this batch function
+// addDumpDurationsToDB();

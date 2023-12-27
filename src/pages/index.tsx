@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { GetStaticProps } from "next";
+import { type GetStaticProps } from "next";
 import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
 import { db } from "~/server/db";
 import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
@@ -117,15 +117,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   // Format data for presentation.
   const prettyDurationToday = minutesToPrettyFormat(
-    sumReleaseMinsToday._sum.dumpDurationMins || 0,
+    sumReleaseMinsToday._sum.dumpDurationMins ?? 0,
     false,
   );
   const prettyDurationLastSevenDays = minutesToPrettyFormat(
-    sumReleaseMinsLastSevenDays._sum.dumpDurationMins || 0,
+    sumReleaseMinsLastSevenDays._sum.dumpDurationMins ?? 0,
     false,
   );
   const prettyDurationAllTime = minutesToPrettyFormat(
-    sumReleaseMinsAllTime._sum.dumpDurationMins || 0,
+    sumReleaseMinsAllTime._sum.dumpDurationMins ?? 0,
     false,
   );
 
