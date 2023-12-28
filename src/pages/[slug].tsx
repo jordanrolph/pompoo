@@ -10,7 +10,10 @@ import {
   getPrettyStatusMessage,
   getRandomStatusLabel,
 } from "~/utils/statusLabels";
-import { calculateTimeDifferenceInMinutes } from "~/utils/dumpDuration";
+import {
+  calculateMinutesSinceLastDump,
+  calculateTimeDifferenceInMinutes,
+} from "~/utils/dumpDuration";
 
 const statusImages = {
   good: {
@@ -228,9 +231,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
-  const minutesSinceLastDump: number = calculateTimeDifferenceInMinutes(
-    mostRecentDump?.dumpEndedAt ?? new Date(),
-    new Date(),
+  const minutesSinceLastDump = calculateMinutesSinceLastDump(
+    mostRecentDump?.dumpEndedAt,
   );
 
   console.log("Most recent: ", mostRecentDump);
@@ -295,5 +297,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       bathingSite: bathingSiteProps,
     },
+    revalidate: 300, // 5 min in seconds
   };
 };

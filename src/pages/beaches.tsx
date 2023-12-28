@@ -8,10 +8,13 @@ import {
 } from "next";
 
 import { db } from "~/server/db";
+import { calculateMinutesSinceLastDump } from "~/utils/dumpDuration";
 
 type BathingSite = {
+  id: number;
   name: string;
   slug: string;
+  siteHasOngoingDumpRightNow: boolean;
 };
 
 export default function Beaches({
@@ -42,9 +45,10 @@ export default function Beaches({
           {bathingSites.map((bathingSite) => (
             <Link
               href={bathingSite.slug}
-              className="block pt-4 text-lg font-medium text-white underline"
+              className="block pt-4 text-lg font-medium text-white"
             >
-              {bathingSite.name}
+              <span className="underline">{bathingSite.name}</span>
+              {bathingSite.siteHasOngoingDumpRightNow ? " 💩" : ""}
             </Link>
           ))}
         </div>
@@ -56,13 +60,49 @@ export default function Beaches({
 export const getStaticProps = (async (context) => {
   const bathingSites = await db.bathingSite.findMany({
     select: {
+      id: true,
       name: true,
       slug: true,
+      dumps: {
+        take: 1,
+        select: {
+          dump: {
+            select: {
+              dumpEndedAt: true,
+            },
+          },
+        },
+        orderBy: {
+          dump: {
+            dumpStartedAt: "desc",
+          },
+        },
+      },
     },
     orderBy: { name: "asc" },
   });
 
-  return { props: { bathingSites } };
+  const bathingSitesWithCurrentStatus = bathingSites.map((bathingSite) => {
+    const minutesSinceLastDump = calculateMinutesSinceLastDump(
+      bathingSite.dumps[0]?.dump.dumpEndedAt,
+    );
+    const siteHasOngoingDumpRightNow = minutesSinceLastDump < 30; // has a dump in last 30 min
+
+    // const statusIsBad = minutesSinceLastDump <= 30;
+    // const statusIsMeh = minutesSinceLastDump > 30 && minutesSinceLastDump < 1400;
+    // const statusIsOK = minutesSinceLastDump >= 1440;
+    return {
+      id: bathingSite.id,
+      name: bathingSite.name,
+      slug: bathingSite.slug,
+      siteHasOngoingDumpRightNow,
+    };
+  });
+
+  return {
+    props: { bathingSites: bathingSitesWithCurrentStatus },
+    revalidate: 300, // 5 min in seconds
+  };
 }) satisfies GetStaticProps<{
   bathingSites: BathingSite[];
 }>;

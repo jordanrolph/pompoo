@@ -1,5 +1,11 @@
 import { db } from "~/server/db";
 
+export function calculateMinutesSinceLastDump(
+  endedAt: Date | null | undefined,
+): number {
+  return calculateTimeDifferenceInMinutes(endedAt ?? new Date(), new Date());
+}
+
 export function calculateTimeDifferenceInMinutes(
   startedAt: Date,
   endedAt: Date,
