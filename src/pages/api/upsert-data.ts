@@ -1,13 +1,14 @@
-import { setEngine } from "crypto";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { WebhookResponseData, WebhookRequestBody } from "types/types";
 import { env } from "~/env";
+import { insertLogToDB } from "~/server/insertLogToDB";
+import { insertScrapedPagesToDB } from "~/server/insertScrapedPagesToDB";
 
 interface CustomNextApiRequest extends NextApiRequest {
   body: WebhookRequestBody;
 }
 
-export default function handler(
+export default async function handler(
   req: CustomNextApiRequest,
   res: NextApiResponse<WebhookResponseData>,
 ) {
@@ -27,6 +28,9 @@ export default function handler(
         log?.status ?? "no"
       } status`,
     });
+
+    await insertLogToDB(log);
+    await insertScrapedPagesToDB(scrapedPages);
 
     console.log(`Webhook done at ${new Date().toLocaleString()}`);
     return;

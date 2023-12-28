@@ -1,6 +1,6 @@
 import { db } from "~/server/db";
 
-function generateSlugFromName(name: string): string {
+export function generateSlugFromName(name: string): string {
   // Replace "&" with "and"
   let slug = name.replace(/&/g, "and");
 
