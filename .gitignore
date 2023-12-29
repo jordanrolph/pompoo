@@ -40,3 +40,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# bulk backfill data (this file can be huge)
+scrapedPages.json

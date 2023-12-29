@@ -12,7 +12,8 @@
     "lint": "next lint",
     "start": "next start",
     "script:slugs": "tsx ./src/utils/slug.ts",
-    "script:duration": "tsx ./src/utils/dumpDuration.ts"
+    "script:duration": "tsx ./src/utils/dumpDuration.ts",
+    "script:insert-from-file": "tsx ./src/utils/insertFromFile.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",
