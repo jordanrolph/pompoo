@@ -1,6 +1,6 @@
 import { insertScrapedPagesToDB } from "~/server/insertScrapedPagesToDB";
-// @ts-ignore
-import scrapedPagesFromFile from "./scrapedPages.json";
+// @ts-expect-error - this file may not exist
+import scrapedPagesFromFile from "./scrapedPages_MAY_NOT_EXIST.json";
 import { ScrapedPage } from "types/types";
 
 /**
@@ -12,4 +12,4 @@ import { ScrapedPage } from "types/types";
  * Get this file by running `npm run script:save` in pompoo-scraper
  * then copy-paste it into the utils folder here.
  */
-insertScrapedPagesToDB(scrapedPagesFromFile as ScrapedPage[]);
+await insertScrapedPagesToDB(scrapedPagesFromFile as ScrapedPage[]);
