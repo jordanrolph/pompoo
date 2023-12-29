@@ -114,7 +114,7 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
         <section className="flex flex-wrap gap-6 text-lg  text-white lg:gap-10">
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-              Last Week
+              7 days
             </h2>
             <p className="font-medium">
               {bathingSite.stats.prettyDurationLastSevenDays}
@@ -122,7 +122,7 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-              Last Month
+              30 days
             </h2>
             <p className="font-medium">
               {bathingSite.stats.prettyDurationLastThirtyDays}
