@@ -55,7 +55,7 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
   return (
     <>
       <Head>
-        <title>{`"Pompoo - "${bathingSite.name}`}</title>
+        <title>{`Pompoo - ${bathingSite.name}`}</title>
         <meta
           name="description"
           content={`Check Southern Water's sewage releases to ${bathingSite.name}`}
