@@ -43,3 +43,4 @@ yarn-error.log*
 
 # bulk backfill data (this file can be huge)
 scrapedPages.json
+todo.txt
