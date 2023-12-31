@@ -44,6 +44,7 @@ export default function Beaches({
           </h1>
           {bathingSites.map((bathingSite) => (
             <Link
+              key={bathingSite.slug}
               href={bathingSite.slug}
               className="block pt-4 text-lg font-medium text-white"
             >

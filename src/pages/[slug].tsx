@@ -14,6 +14,7 @@ import {
   calculateMinutesSinceLastDump,
   calculateTimeDifferenceInMinutes,
 } from "~/utils/dumpDuration";
+import { sumDumpDurationsWithinWindow } from "~/utils/countDurationWithinWindow";
 
 const statusImages = {
   good: {
@@ -162,11 +163,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
-  // Query sum of release durations in the last 7 days for this site.
-  const sumReleaseMinsLastSevenDays = await db.dump.aggregate({
+  const today = new Date();
+  const thirtyDaysAgo = getDateForDaysAgo(30);
+  const sevenDaysAgo = getDateForDaysAgo(7);
+
+  const releasesInLastThirtyDays = await db.dump.findMany({
     where: {
       dumpEndedAt: {
-        gte: getDateForDaysAgo(7),
+        gte: thirtyDaysAgo,
       },
       bathingSites: {
         some: {
@@ -176,31 +180,29 @@ export const getStaticProps: GetStaticProps = async (context) => {
         },
       },
     },
-    _sum: {
-      dumpDurationMins: true,
+    orderBy: {
+      dumpStartedAt: "desc",
     },
   });
 
-  // Query sum of release durations in the last 30 days for this site.
-  const sumReleaseMinsLastThirtyDays = await db.dump.aggregate({
-    where: {
-      dumpEndedAt: {
-        gte: getDateForDaysAgo(30),
-      },
-      bathingSites: {
-        some: {
-          bathingSite: {
-            id: bathingSite.id,
-          },
-        },
-      },
-    },
-    _sum: {
-      dumpDurationMins: true,
-    },
-  });
+  // Calculate the minutes of releases that fall within the given date range.
+  // This accounts for an event partially falling within the range by only counting
+  // the release minutes that were within the range.
+  const dumpDurationMinutesWithinLastSevenDays = sumDumpDurationsWithinWindow(
+    releasesInLastThirtyDays,
+    sevenDaysAgo,
+    today,
+  );
+  const dumpDurationMinutesWithinLastThirtyDays = sumDumpDurationsWithinWindow(
+    releasesInLastThirtyDays,
+    thirtyDaysAgo,
+    today,
+  );
 
   // Query sum of release durations for all time for this site.
+  // Because it is for all time, this query can be naive because it
+  // doesn't need to worry about parts of a release event's dates
+  // overlapping with a query range.
   const sumReleaseMinsAllTime = await db.dump.aggregate({
     where: {
       bathingSites: {
@@ -216,6 +218,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   });
 
+  // This may not be the same as `releasesInLastThirtyDays[0]` becuase
+  // some sites last released a long time ago.
   const mostRecentDump = await db.dump.findFirst({
     where: {
       bathingSites: {
@@ -227,16 +231,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
       },
     },
     orderBy: {
-      dumpStartedAt: "desc",
+      dumpEndedAt: "desc",
     },
   });
 
   const minutesSinceLastDump = calculateMinutesSinceLastDump(
     mostRecentDump?.dumpEndedAt,
   );
-
-  console.log("Most recent: ", mostRecentDump);
-  console.log("Time since", minutesSinceLastDump);
 
   // If the end time is not set, calculate from the current time
   const ongoingDumpMinutesDuration =
@@ -260,11 +261,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   // Format data for presentation.
   const prettyDurationLastSevenDays = minutesToPrettyFormat(
-    sumReleaseMinsLastSevenDays._sum.dumpDurationMins ?? 0,
+    dumpDurationMinutesWithinLastSevenDays,
     false,
   );
   const prettyDurationLastThirtyDays = minutesToPrettyFormat(
-    sumReleaseMinsLastThirtyDays._sum.dumpDurationMins ?? 0,
+    dumpDurationMinutesWithinLastThirtyDays,
     false,
   );
   const prettyDurationAllTime = minutesToPrettyFormat(
