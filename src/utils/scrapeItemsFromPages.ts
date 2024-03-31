@@ -1,4 +1,7 @@
+import pLimit from "p-limit";
 import type { ScrapedEvent, ScrapedPage } from "types/types";
+
+const MAX_CONCURRENT_REQUESTS = 3; // Maximum concurrent API requests allowed
 
 interface PlatformHeader {
   "sec-ch-ua": string;
@@ -80,17 +83,25 @@ export default async function scrapeItemsFromPages(
   try {
     console.log(`scrapeItemsFromPages called`);
 
-    let scrapedItems: ScrapedEvent[] = [];
+    const limit = pLimit(MAX_CONCURRENT_REQUESTS);
+    const scrapePromises: Promise<ScrapedPage>[] = [];
 
-    // Pages are requested sequentially so we don't hit the API's rate limit
+    // Start all scrapePage calls concurrently, respecting the concurrency limit
     for (
       let pageNumber = 1;
       pageNumber <= numberOfPagesToScrape;
       pageNumber++
     ) {
-      const page = await scrapePage(pageNumber);
-      scrapedItems = scrapedItems.concat(page.items);
+      // Queue the scrapePage call with the concurrency limiter
+      const scrapePromise = limit(() => scrapePage(pageNumber));
+
+      scrapePromises.push(scrapePromise);
     }
+
+    // Wait for all promises to resolve
+    const pages = await Promise.all(scrapePromises);
+
+    const scrapedItems: ScrapedEvent[] = pages.flatMap((page) => page.items);
 
     return scrapedItems;
   } catch (error) {
