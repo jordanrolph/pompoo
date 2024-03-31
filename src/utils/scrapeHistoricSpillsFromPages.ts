@@ -1,7 +1,5 @@
 import pLimit from "p-limit";
-import type { ScrapedEvent, ScrapedPage } from "types/types";
-
-const MAX_CONCURRENT_REQUESTS = 3; // Maximum concurrent API requests allowed
+import type { ScrapedHistoricSpill, ScrapedPage } from "types/types";
 
 interface PlatformHeader {
   "sec-ch-ua": string;
@@ -9,6 +7,7 @@ interface PlatformHeader {
   "user-agent": string;
 }
 
+// Random headers to spoof the user agent. I have no evidence this is needed, but it should help evade detection.
 const platformHeaders: PlatformHeader[] = [
   {
     "sec-ch-ua":
@@ -42,6 +41,7 @@ function generatePageURL(pageNumber: number) {
   return `${baseURL}&page=${pageNumber}`;
 }
 
+// This function fetches data from a single numbered page on the paginated API.
 async function scrapePage(pageNumber: number): Promise<ScrapedPage> {
   console.log(`Scraping page ${pageNumber}`);
 
@@ -77,11 +77,16 @@ async function scrapePage(pageNumber: number): Promise<ScrapedPage> {
   throw new Error(`Fetch failed with status: ${fetchResponse.statusText}`);
 }
 
-export default async function scrapeItemsFromPages(
+// This function co-ordinates scraping multiple pages, then returns the combined data as one flat array.
+// It can handle scraping multiple pages at once using the `numberOfPagesToScrape` arg. It makes multiple
+// API calls at once to reduce the wait time, but also limits the number of concurrent requests to avoid
+// overloading the API.
+export default async function scrapeHistoricSpillsFromPages(
   numberOfPagesToScrape: number = 2,
-): Promise<ScrapedEvent[]> {
+): Promise<ScrapedHistoricSpill[]> {
   try {
-    console.log(`scrapeItemsFromPages called`);
+    console.log(`scrapeHistoricSpillsFromPages called`);
+    const MAX_CONCURRENT_REQUESTS = 3; // Maximum concurrent API requests allowed
 
     const limit = pLimit(MAX_CONCURRENT_REQUESTS);
     const scrapePromises: Promise<ScrapedPage>[] = [];
@@ -101,13 +106,15 @@ export default async function scrapeItemsFromPages(
     // Wait for all promises to resolve
     const pages = await Promise.all(scrapePromises);
 
-    const scrapedItems: ScrapedEvent[] = pages.flatMap((page) => page.items);
+    const scrapedHistoricSpills: ScrapedHistoricSpill[] = pages.flatMap(
+      (page) => page.items.flatMap((item) => item.historicSpillsList),
+    );
 
-    return scrapedItems;
+    return scrapedHistoricSpills;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error("scrapeItemsFromPages failed without message");
+    throw new Error("scrapeHistoricSpillsFromPages failed without message");
   }
 }

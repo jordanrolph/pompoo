@@ -1,14 +1,15 @@
-import { insertScrapedPagesToDB } from "~/server/insertScrapedPagesToDB";
-import scrapeItemsFromPages from "./scrapeItemsFromPages";
+import { insertScrapedHistoricSpillsToDB } from "~/server/insertScrapedHistoricSpillsToDB";
+import scrapeHistoricSpillsFromPages from "./scrapeHistoricSpillsFromPages";
 
-const numberOfPagesToScrape = 1;
+const NUMBER_OF_PAGES_TO_SCRAPE = 3;
 
 try {
-  console.log(`Scraping ${numberOfPagesToScrape} historic pages`);
+  console.log(`Scraping ${NUMBER_OF_PAGES_TO_SCRAPE} historic pages`);
 
-  const scrapedItems = await scrapeItemsFromPages(2);
-  console.log(scrapedItems);
-  //   await insertScrapedPagesToDB(scrapedPages);
+  const scrapedHistoricSpills = await scrapeHistoricSpillsFromPages(
+    NUMBER_OF_PAGES_TO_SCRAPE,
+  );
+  await insertScrapedHistoricSpillsToDB(scrapedHistoricSpills);
 
   console.log("Done scraping historic pages");
 } catch (error) {

@@ -4,7 +4,10 @@ import {
 } from "types/types";
 import { env } from "~/env";
 import { insertLogToDB } from "~/server/insertLogToDB";
-import { insertScrapedPagesToDB } from "~/server/insertScrapedPagesToDB";
+import { insertScrapedHistoricSpillsToDB } from "~/server/insertScrapedHistoricSpillsToDB";
+import scrapeHistoricSpillsFromPages from "~/utils/scrapeHistoricSpillsFromPages";
+
+const NUMBER_OF_PAGES_TO_SCRAPE = 2;
 
 export default async function handler(
   req: GetNewReleasesWebhookRequest,
@@ -21,12 +24,14 @@ export default async function handler(
       console.log(`Webhook called at ${new Date().toLocaleString()}`);
 
       try {
-        const scrapedPages = await scrapePages();
-        await insertScrapedPagesToDB(scrapedPages);
+        const scrapedHistoricSpills = await scrapeHistoricSpillsFromPages(
+          NUMBER_OF_PAGES_TO_SCRAPE,
+        );
+        await insertScrapedHistoricSpillsToDB(scrapedHistoricSpills);
         await insertLogToDB({
           type: "Scrape",
           status: "OK",
-          message: "Inserted X logs",
+          message: `Fetched ${scrapedHistoricSpills.length}`,
         });
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -47,8 +52,4 @@ export default async function handler(
   } catch (error) {
     console.error(error);
   }
-}
-
-async function scrapePages() {
-  return [];
 }

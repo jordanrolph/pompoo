@@ -19,6 +19,8 @@ export function calculateTimeDifferenceInMinutes(
   return differenceInMinutes;
 }
 
+// Mar 2024: I can't remember why this function was needed. I think it's likely I did a large DB
+// insert but forgot to add the durations, so I wrote this to add in durations afterwards?
 async function addDumpDurationsToDB() {
   console.log("running addDumpDurationsToDB");
   try {
