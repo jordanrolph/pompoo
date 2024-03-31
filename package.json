@@ -13,7 +13,8 @@
     "start": "next start",
     "script:slugs": "tsx ./src/utils/slug.ts",
     "script:duration": "tsx ./src/utils/dumpDuration.ts",
-    "script:insert-from-file": "tsx ./src/utils/insertFromFile.ts"
+    "script:insert-from-file": "tsx ./src/utils/insertFromFile.ts",
+    "script:seed-historic-release-data": "tsx ./src/utils/seedHistoricReleaseData.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",

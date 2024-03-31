@@ -1,3 +1,5 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+
 export interface ScrapedEvent {
   id: number;
   eventId: number;
@@ -35,3 +37,13 @@ export interface WebhookRequestBody {
 export type WebhookResponseData = {
   message: string;
 };
+
+export interface GetNewReleasesWebhookRequest extends NextApiRequest {
+  body: {
+    secret: string;
+  };
+}
+
+export interface GetNewReleasesWebhookResponse extends NextApiResponse {
+  message: string;
+}
