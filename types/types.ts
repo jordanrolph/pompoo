@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export interface ScrapedEvent {
+// This type is where the actual useful scraped data is held. ScrapedHistoricSpill is wrapped
+// by ScrapedItem, but the other values in ScrapedItem object are just from the 0th element of
+// the historicSpillsList array, with an incorrect overFlowSiteId value (the value is always 0).
+export interface ScrapedHistoricSpill {
   id: number;
   eventId: number;
   siteUnitNumber: number;
@@ -8,18 +11,36 @@ export interface ScrapedEvent {
   eventStart: string;
   eventStop: string;
   duration: number;
-  activity?: string;
   status?: string;
   associatedSiteId: number;
   outfallName: string;
-  isImpacting: false;
+  isImpacting: boolean;
+  overFlowSiteId: number;
+  historicSpillsList?: []; // Ignore: this value is either missing or empty on the ScrapedHistoricSpill children
+}
+
+// Ignore the all data in this ScrapedItem except the historicSpillsList.
+export interface ScrapedItem {
+  id: number;
+  eventId: number;
+  siteUnitNumber: number;
+  bathingSite: string;
+  eventStart: string;
+  eventStop: string;
+  duration: number;
+  status?: string;
+  associatedSiteId: number;
+  outfallName: string;
+  isImpacting: boolean;
+  overFlowSiteId: number; // Ignore: this value is always 0 in the ScrapedItem parent
+  historicSpillsList: ScrapedHistoricSpill[];
 }
 
 export interface ScrapedPage {
   currentPage: number;
   totalItems: number;
   totalPages: number;
-  items: ScrapedEvent[];
+  items: ScrapedItem[];
 }
 
 export interface Log {
