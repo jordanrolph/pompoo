@@ -28,16 +28,6 @@ export interface Log {
   message: string;
 }
 
-export interface WebhookRequestBody {
-  scrapedPages: ScrapedPage[];
-  log: Log;
-  secret: string;
-}
-
-export type WebhookResponseData = {
-  message: string;
-};
-
 export interface GetNewReleasesWebhookRequest extends NextApiRequest {
   body: {
     secret: string;
