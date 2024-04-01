@@ -18,8 +18,8 @@ export default async function handler(
 ) {
   // Check this is a valid request
   if (
-    req.headers["Authorization"] !== `Bearer ${env.WORKER_SECRET}` &&
-    req.headers["authorization"] !== `Bearer ${env.WORKER_SECRET}`
+    req.headers.Authorization !== `Bearer ${env.WORKER_SECRET}` &&
+    req.headers.authorization !== `Bearer ${env.WORKER_SECRET}`
   ) {
     return res.status(401).end("Unauthorized");
   }

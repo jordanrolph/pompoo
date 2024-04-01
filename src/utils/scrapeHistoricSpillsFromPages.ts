@@ -49,7 +49,7 @@ async function scrapePage(pageNumber: number): Promise<ScrapedPage> {
   const randomIndex = Math.floor(Math.random() * platformHeaders.length);
   const randomPlatformHeader = platformHeaders[randomIndex];
 
-  const fetchResponse = await fetch(pageURL, {
+  const response = await fetch(pageURL, {
     headers: {
       accept: "*/*",
       "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
@@ -70,11 +70,12 @@ async function scrapePage(pageNumber: number): Promise<ScrapedPage> {
     method: "GET",
   });
 
-  if (fetchResponse.status === 200) {
-    return fetchResponse.json();
+  if (!response.ok) {
+    throw new Error(`Error fetching page ${pageURL}`);
   }
 
-  throw new Error(`Fetch failed with status: ${fetchResponse.statusText}`);
+  const responseData = (await response.json()) as ScrapedPage;
+  return responseData;
 }
 
 // This function co-ordinates scraping multiple pages, then returns the combined data as one flat array.

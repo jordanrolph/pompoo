@@ -5,7 +5,7 @@ const MAX_RETRIES = 10;
 const DELAY_MS = 1000;
 const BATCH_SIZE = 3; // Number of pages to try fetching before processsing
 const LAST_PAGE = 225; // As of 2024-03-31, page 225 had data from 2023-12-09
-let currentPage = 134;
+let currentPage = 1;
 
 // This function gives retry logic to any async function, passed as an arguement. If
 // the async function fails (throws an error), the error is caught and the function
@@ -45,7 +45,7 @@ try {
       });
     });
 
-  await insertScrapedHistoricSpillsToDB(scrapedHistoricSpills);
+    await insertScrapedHistoricSpillsToDB(scrapedHistoricSpills);
 
     console.log(`Processed historic pages ${startPage} to ${endPage}`);
 

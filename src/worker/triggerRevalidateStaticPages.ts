@@ -18,7 +18,7 @@ export default async function triggerRevalidateStaticPages() {
       throw new Error("Error calling webhook");
     }
 
-    const responseData: ResponseData = await response.json();
+    const responseData = (await response.json()) as ResponseData;
 
     console.log("Done revalidating pages", responseData.message);
   } catch (error) {

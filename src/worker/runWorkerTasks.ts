@@ -6,7 +6,7 @@ async function runWorkerTasks() {
   await getNewReleases();
   await triggerRevalidateStaticPages();
   console.log("Worker tasks complete");
-  process.exit(0);
 }
 
-runWorkerTasks();
+await runWorkerTasks();
+process.exit(0);
