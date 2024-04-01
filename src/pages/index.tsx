@@ -5,7 +5,7 @@ import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
 import { db } from "~/server/db";
 import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
 import { IconFlag3 } from "@tabler/icons-react";
-import Nav from "~/components/nav";
+import Nav from "~/components/Nav";
 
 interface HomeProps {
   stats: {
