@@ -1,10 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
-import Image from "next/image";
 import { type GetStaticProps } from "next";
 import getDateForDaysAgo from "~/utils/getDateForDaysAgo";
 import { db } from "~/server/db";
 import { minutesToPrettyFormat } from "~/utils/minutesToPrettyFormat";
+import { IconFlag3 } from "@tabler/icons-react";
+import Nav from "~/components/nav";
 
 interface HomeProps {
   stats: {
@@ -26,41 +27,30 @@ export default function Home({ stats }: HomeProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex h-[calc(100dvh)] min-h-[460px] flex-col items-center justify-between bg-black p-4 text-center">
-        <Image
-          src="/pompoo-logo.png"
-          alt="Pompoo Logo"
-          width={98}
-          height={25}
-        />
-        <div className="flex max-w-[400px] flex-col items-center gap-8 md:max-w-[500px] lg:max-w-[640px] lg:gap-10">
-          <h1 className="text-center text-4xl font-medium text-white md:text-5xl lg:text-6xl">
-            Check sewage releases before you swim
+      <main className="flex h-[calc(100dvh)] min-h-[460px] flex-col items-center justify-between bg-gradient-to-br from-black to-zinc-950 p-4 text-center">
+        <Nav />
+        <header className="flex max-w-prose flex-col items-center gap-10 lg:gap-16">
+          <h1 className="lg:leading-tighter text-center text-5xl font-semibold text-white sm:text-6xl lg:text-7xl">
+            Check sewage
+            <br /> releases before <br /> you swim
           </h1>
+
           <Link
-            className="flex items-center gap-3 rounded-lg bg-amber-400 px-3 py-2 text-black hover:bg-amber-300"
+            className="flex items-center gap-3 rounded-lg border border-amber-300 bg-gradient-to-br from-amber-400 via-amber-300 to-amber-400 py-2 pl-5 pr-4 outline-2 outline-offset-2 outline-amber-500 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 hover:shadow-inner focus:outline-dashed md:py-3 lg:gap-3.5 lg:pl-6 lg:pr-5"
             href="/beaches"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 18 18"
-              fill="none"
-              className="h-6 w-6"
-            >
-              <path
-                d="M7.25 3L2.75 5.25V15L7.25 12.75M7.25 3L11.75 5.25M7.25 3V12.75M11.75 5.25L16.25 3V12.75L11.75 15M11.75 5.25V15M11.75 15L7.25 12.75"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <p className="text-lg font-medium">Pick your beach</p>
+            <span className="pt-0.5 text-lg font-semibold text-black md:pt-0 md:text-xl">
+              Pick your beach
+            </span>
+            <IconFlag3
+              stroke={2}
+              className="h-6 w-6 text-amber-950  md:h-7 md:w-7"
+            />
           </Link>
-        </div>
+        </header>
         <section className="flex flex-wrap gap-6 text-lg font-medium text-white lg:gap-10">
           <div className="flex flex-col gap-1">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-amber-300">
+            <h2 className="text-xs font-medium uppercase tracking-wide text-amber-400">
               Releases Today
             </h2>
             <p>{stats.prettyDurationToday}</p>

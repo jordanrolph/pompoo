@@ -15,6 +15,7 @@ import {
   calculateTimeDifferenceInMinutes,
 } from "~/utils/dumpDuration";
 import { sumDumpDurationsWithinWindow } from "~/utils/countDurationWithinWindow";
+import { IconMenu2 } from "@tabler/icons-react";
 
 const statusImages = {
   good: {
@@ -64,57 +65,47 @@ export default function BathingSite({ bathingSite }: BathingSiteProps) {
       </Head>
 
       <main className="flex h-[calc(100dvh)] min-h-[600px] flex-col items-center justify-between bg-black p-4 text-center">
-        <Link
-          className="mt-2 inline-flex items-center gap-3 rounded-lg border border-zinc-400 px-3 py-1 text-white hover:border-white"
-          href="/beaches"
-        >
-          {/* Hamburger SVG */}
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+        <nav>
+          <Link
+            className="mt-2 inline-flex items-center gap-4 rounded-lg border border-zinc-600 bg-gradient-to-br from-black via-zinc-950 to-black py-1 pl-3 pr-4 text-white hover:border-white lg:gap-6 lg:px-5 lg:pl-4"
+            href="/beaches"
           >
-            <path
-              d="M3 5.5H15M3 10H15M3 14.5H15"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <div>
-            <Image
-              src="/pompoo-logo.png"
-              alt="Pompoo Logo"
-              width={59}
-              height={15}
-            />
-            <p className="-mt-1 text-xl font-medium lg:text-2xl">
-              {bathingSite.name}
-            </p>
-          </div>
-        </Link>
+            <IconMenu2 />
+            <div className="flex flex-col items-start justify-start">
+              <p>
+                <Link
+                  href="/"
+                  className="text-left text-xs font-semibold uppercase tracking-[0.15em] text-zinc-100 lg:text-sm"
+                >
+                  Pompoo
+                </Link>
+              </p>
+              <h1 className="-mt-1 text-xl font-medium lg:text-2xl">
+                {bathingSite.name}
+              </h1>
+            </div>
+          </Link>
+        </nav>
 
-        <div className="my-4 flex max-w-96 grow flex-col items-center justify-center">
+        <div className="my-4 flex max-w-prose grow flex-col items-center justify-center lg:max-w-lg">
           <Image
             src={statusImages[bathingSite.status.code].src}
             alt={statusImages[bathingSite.status.code].alt}
-            height={120}
-            width={120}
+            height={130}
+            width={130}
             placeholder="blur"
             blurDataURL={statusImages[bathingSite.status.code].blurDataUrl}
           />
-          <h1 className="mt-4 text-3xl font-medium text-white lg:text-5xl">
+          <h2 className="mt-6 text-center text-4xl font-medium text-white md:text-5xl lg:text-6xl">
             {bathingSite.status.title}
-          </h1>
-          <p className="mt-6 text-left text-amber-100 lg:text-lg">
+          </h2>
+          <p className="mt-6 max-w-md text-center text-lg text-zinc-400 lg:text-2xl lg:font-light lg:leading-relaxed">
             {bathingSite.status.message}
           </p>
         </div>
         <section className="flex flex-wrap gap-6 text-lg  text-white lg:gap-10">
           <div className="flex flex-col gap-1">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+            <h2 className="text-xs font-medium uppercase tracking-wide text-amber-400">
               7 days
             </h2>
             <p className="font-medium">
@@ -248,10 +239,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
           new Date(),
         );
 
-  // Last dump is still ongoing or last 30 minutes = bad
+  // Last dump is still ongoing or last 120 minutes = bad
   let statusCode: keyof StatusLabel = "bad";
-  // Last dump ended more than 30 mins ago = good
-  if (minutesSinceLastDump > 30) {
+  // Last dump ended more than 120 mins ago =  meh
+  if (minutesSinceLastDump > 120) {
     statusCode = "meh";
   }
   // Last dump ended more than 24 hours ago = good

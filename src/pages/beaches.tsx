@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Link from "next/link";
-import Image from "next/image";
 import {
   type InferGetStaticPropsType,
   type GetStaticProps,
@@ -9,6 +8,8 @@ import {
 
 import { db } from "~/server/db";
 import { calculateMinutesSinceLastDump } from "~/utils/dumpDuration";
+import Nav from "~/components/nav";
+import { IconAsterisk } from "@tabler/icons-react";
 
 type BathingSite = {
   id: number;
@@ -28,30 +29,36 @@ export default function Beaches({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex min-h-screen flex-col items-center bg-black p-4">
-        <Link href="/">
-          <Image
-            src="/pompoo-logo.png"
-            alt="Pompoo Logo"
-            width={98}
-            height={25}
-          />
-        </Link>
+      <main className=" mx-auto flex min-h-screen max-w-prose flex-col items-center bg-black">
+        <Nav />
 
-        <div className="min-w-80">
-          <h1 className="mt-8 text-sm text-zinc-400">
+        <div className="w-full">
+          <h1 className="ml-6 mt-8 text-lg font-light text-zinc-500">
             Choose a beach to check
           </h1>
-          {bathingSites.map((bathingSite) => (
-            <Link
-              key={bathingSite.slug}
-              href={bathingSite.slug}
-              className="block pt-4 text-lg font-medium text-white"
-            >
-              <span className="underline">{bathingSite.name}</span>
-              {bathingSite.siteHasOngoingDumpRightNow ? " 💩" : ""}
-            </Link>
-          ))}
+          <ul className="mb-12 mt-3 rounded-xl border-zinc-900 px-6 pb-5 pt-1 lg:border lg:bg-zinc-950 lg:pt-3">
+            {bathingSites.map((bathingSite) => (
+              <li className="my-4">
+                <Link
+                  key={bathingSite.slug}
+                  href={bathingSite.slug}
+                  className={`inline-flex items-center gap-2.5 py-2 text-xl font-medium  underline decoration-zinc-700 decoration-dotted decoration-2 underline-offset-8 hover:text-white hover:decoration-white hover:decoration-solid focus:decoration-white lg:text-2xl ${
+                    bathingSite.siteHasOngoingDumpRightNow
+                      ? "text-amber-400"
+                      : "text-zinc-300"
+                  }`}
+                >
+                  <span className="">{bathingSite.name}</span>
+                  {bathingSite.siteHasOngoingDumpRightNow && (
+                    <IconAsterisk
+                      stroke={2}
+                      className="w-4 text-zinc-400 lg:w-5"
+                    />
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </main>
     </>
@@ -87,10 +94,10 @@ export const getStaticProps = (async (context) => {
     const minutesSinceLastDump = calculateMinutesSinceLastDump(
       bathingSite.dumps[0]?.dump.dumpEndedAt,
     );
-    const siteHasOngoingDumpRightNow = minutesSinceLastDump < 30; // has a dump in last 30 min
+    const siteHasOngoingDumpRightNow = minutesSinceLastDump < 120; // has a dump in last 120 min
 
-    // const statusIsBad = minutesSinceLastDump <= 30;
-    // const statusIsMeh = minutesSinceLastDump > 30 && minutesSinceLastDump < 1400;
+    // const statusIsBad = minutesSinceLastDump <= 120;
+    // const statusIsMeh = minutesSinceLastDump > 120 && minutesSinceLastDump < 1400;
     // const statusIsOK = minutesSinceLastDump >= 1440;
     return {
       id: bathingSite.id,
@@ -102,7 +109,6 @@ export const getStaticProps = (async (context) => {
 
   return {
     props: { bathingSites: bathingSitesWithCurrentStatus },
-    revalidate: 300, // 5 min in seconds
   };
 }) satisfies GetStaticProps<{
   bathingSites: BathingSite[];
