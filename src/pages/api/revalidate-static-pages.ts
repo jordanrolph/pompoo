@@ -10,7 +10,7 @@ type ErrorResponse = {
   message: string;
 };
 
-type ResponseData = SuccessResponse | ErrorResponse;
+export type ResponseData = SuccessResponse | ErrorResponse;
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,8 +18,8 @@ export default async function handler(
 ) {
   // Check this is a valid request
   if (
-    req.headers["Authorization"] !== `Bearer ${env.CRON_SECRET}` &&
-    req.headers["authorization"] !== `Bearer ${env.CRON_SECRET}`
+    req.headers["Authorization"] !== `Bearer ${env.WORKER_SECRET}` &&
+    req.headers["authorization"] !== `Bearer ${env.WORKER_SECRET}`
   ) {
     return res.status(401).end("Unauthorized");
   }
