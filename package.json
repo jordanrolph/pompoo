@@ -13,7 +13,7 @@
     "start": "next start",
     "script:slugs": "tsx ./src/utils/slug.ts",
     "script:duration": "tsx ./src/utils/dumpDuration.ts",
-    "script:seed-historic-release-data": "SKIP_ENV_VALIDATION=true DATABASE_URL=postgresql://postgres:4f55e3Ge14B144c2f4Cf56d5ecAGE4cb@roundhouse.proxy.rlwy.net:36580/railway tsx ./src/utils/seedHistoricReleaseData.ts",
+    "script:seed-historic-release-data": "SKIP_ENV_VALIDATION=true tsx ./src/utils/seedHistoricReleaseData.ts",
     "script:run-worker-tasks": "SKIP_ENV_VALIDATION=true tsx ./src/worker/runWorkerTasks.ts"
   },
   "dependencies": {
