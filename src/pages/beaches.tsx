@@ -8,7 +8,7 @@ import {
 
 import { db } from "~/server/db";
 import { calculateMinutesSinceLastDump } from "~/utils/dumpDuration";
-import Nav from "~/components/nav";
+import Nav from "../components/nav";
 import { IconAsterisk } from "@tabler/icons-react";
 
 type BathingSite = {
