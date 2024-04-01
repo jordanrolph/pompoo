@@ -48,13 +48,3 @@ export interface Log {
   status: "OK" | "Failure";
   message: string;
 }
-
-export interface GetNewReleasesWebhookRequest extends NextApiRequest {
-  body: {
-    secret: string;
-  };
-}
-
-export interface GetNewReleasesWebhookResponse extends NextApiResponse {
-  message: string;
-}

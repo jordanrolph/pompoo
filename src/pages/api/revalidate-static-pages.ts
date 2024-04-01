@@ -16,8 +16,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
 ) {
-  console.log("HERE!", env.CRON_SECRET);
-  console.log("Header", req.headers["authorization"]);
   // Check this is a valid request
   if (
     req.headers["Authorization"] !== `Bearer ${env.CRON_SECRET}` &&
@@ -26,7 +24,7 @@ export default async function handler(
     return res.status(401).end("Unauthorized");
   }
 
-  console.log("Running");
+  console.log("Cron task running: Revalidating static pages");
 
   try {
     // NextJS res.revalidate only accepts the actual path string, not a variable path
@@ -43,12 +41,15 @@ export default async function handler(
 
     await Promise.all(pathsToRevalidate.map((path) => res.revalidate(path)));
 
-    console.log("Done revalidating");
+    console.log("Done revalidating static pages");
 
     return res.status(200).json({ message: "Done revalidating" });
   } catch (error) {
+    const errorMessage =
+      (error as Error)?.message || "Error revalidating static pages";
     // If there was an error, Next.js will continue
     // to show the last successfully generated page
-    return res.status(500).json({ message: (error as Error).message });
+    console.error(errorMessage);
+    return res.status(500).json({ message: errorMessage });
   }
 }
