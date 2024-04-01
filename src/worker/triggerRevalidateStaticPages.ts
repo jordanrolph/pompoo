@@ -4,8 +4,6 @@ import { ResponseData } from "~/pages/api/revalidate-static-pages";
 const URL = "https://pompoo.org/api/revalidate-static-pages";
 
 export default async function triggerRevalidateStaticPages() {
-  console.log("Getting new releases");
-
   try {
     console.log("Revalidating pages using NextJS webhook");
     const response = await fetch(URL, {
