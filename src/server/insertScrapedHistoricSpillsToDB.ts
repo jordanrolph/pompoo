@@ -40,6 +40,9 @@ export const insertScrapedHistoricSpillsToDB = async (
         ? new Date(scrapedHistoricSpill.eventStop)
         : new Date();
 
+      console.log(
+        `- Upserting dump ${scrapedHistoricSpill.eventId.toString()}`,
+      );
       const dump = await db.dump.upsert({
         create: {
           dumpStartedAt: startedAt,

@@ -81,22 +81,22 @@ async function scrapePage(pageNumber: number): Promise<ScrapedPage> {
 // It can handle scraping multiple pages at once using the `numberOfPagesToScrape` arg. It makes multiple
 // API calls at once to reduce the wait time, but also limits the number of concurrent requests to avoid
 // overloading the API.
-export default async function scrapeHistoricSpillsFromPages(
-  numberOfPagesToScrape: number = 2,
-): Promise<ScrapedHistoricSpill[]> {
+export default async function scrapeHistoricSpillsFromPages({
+  startPage = 1,
+  endPage = 2,
+}: {
+  startPage: number;
+  endPage: number;
+}): Promise<ScrapedHistoricSpill[]> {
   try {
     console.log(`scrapeHistoricSpillsFromPages called`);
-    const MAX_CONCURRENT_REQUESTS = 3; // Maximum concurrent API requests allowed
+    const MAX_CONCURRENT_REQUESTS = 5; // Maximum concurrent API requests allowed
 
     const limit = pLimit(MAX_CONCURRENT_REQUESTS);
     const scrapePromises: Promise<ScrapedPage>[] = [];
 
     // Start all scrapePage calls concurrently, respecting the concurrency limit
-    for (
-      let pageNumber = 1;
-      pageNumber <= numberOfPagesToScrape;
-      pageNumber++
-    ) {
+    for (let pageNumber = startPage; pageNumber <= endPage; pageNumber++) {
       // Queue the scrapePage call with the concurrency limiter
       const scrapePromise = limit(() => scrapePage(pageNumber));
 

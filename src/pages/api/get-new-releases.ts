@@ -7,7 +7,8 @@ import { insertLogToDB } from "~/server/insertLogToDB";
 import { insertScrapedHistoricSpillsToDB } from "~/server/insertScrapedHistoricSpillsToDB";
 import scrapeHistoricSpillsFromPages from "~/utils/scrapeHistoricSpillsFromPages";
 
-const NUMBER_OF_PAGES_TO_SCRAPE = 2;
+const START_PAGE = 1;
+const END_PAGE = 1;
 
 export default async function handler(
   req: GetNewReleasesWebhookRequest,
@@ -24,9 +25,10 @@ export default async function handler(
       console.log(`Webhook called at ${new Date().toLocaleString()}`);
 
       try {
-        const scrapedHistoricSpills = await scrapeHistoricSpillsFromPages(
-          NUMBER_OF_PAGES_TO_SCRAPE,
-        );
+        const scrapedHistoricSpills = await scrapeHistoricSpillsFromPages({
+          startPage: START_PAGE,
+          endPage: END_PAGE,
+        });
         await insertScrapedHistoricSpillsToDB(scrapedHistoricSpills);
         await insertLogToDB({
           type: "Scrape",
