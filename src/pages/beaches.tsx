@@ -15,7 +15,7 @@ type BathingSite = {
   id: number;
   name: string;
   slug: string;
-  siteHasOngoingDumpRightNow: boolean;
+  siteHasDumpInLast24Hours: boolean;
 };
 
 export default function Beaches({
@@ -43,13 +43,13 @@ export default function Beaches({
                   key={bathingSite.slug}
                   href={bathingSite.slug}
                   className={`inline-flex items-center gap-2.5 py-2 text-xl font-medium  underline decoration-zinc-700 decoration-dotted decoration-2 underline-offset-8 hover:text-white hover:decoration-white hover:decoration-solid focus:decoration-white lg:text-2xl ${
-                    bathingSite.siteHasOngoingDumpRightNow
+                    bathingSite.siteHasDumpInLast24Hours
                       ? "text-amber-400"
                       : "text-zinc-300"
                   }`}
                 >
                   <span className="">{bathingSite.name}</span>
-                  {bathingSite.siteHasOngoingDumpRightNow && (
+                  {bathingSite.siteHasDumpInLast24Hours && (
                     <IconAsterisk
                       stroke={2}
                       className="w-4 text-zinc-400 lg:w-5"
@@ -65,7 +65,7 @@ export default function Beaches({
   );
 }
 
-export const getStaticProps = (async (context) => {
+export const getStaticProps = (async (context: GetStaticPropsContext) => {
   const bathingSites = await db.bathingSite.findMany({
     select: {
       id: true,
@@ -94,16 +94,13 @@ export const getStaticProps = (async (context) => {
     const minutesSinceLastDump = calculateMinutesSinceLastDump(
       bathingSite.dumps[0]?.dump.dumpEndedAt,
     );
-    const siteHasOngoingDumpRightNow = minutesSinceLastDump < 120; // has a dump in last 120 min
+    const siteHasDumpInLast24Hours = minutesSinceLastDump < 1440; // 24 hours in minutes
 
-    // const statusIsBad = minutesSinceLastDump <= 120;
-    // const statusIsMeh = minutesSinceLastDump > 120 && minutesSinceLastDump < 1400;
-    // const statusIsOK = minutesSinceLastDump >= 1440;
     return {
       id: bathingSite.id,
       name: bathingSite.name,
       slug: bathingSite.slug,
-      siteHasOngoingDumpRightNow,
+      siteHasDumpInLast24Hours,
     };
   });
 
