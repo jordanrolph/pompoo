@@ -31,7 +31,7 @@ export default async function handler(
     // e.g. for "/blog/[slug]" this should be "/blog/post-1", "/blog/post-1",...etc.
 
     // Home page route
-    let pathsToRevalidate: string[] = ["/"];
+    let pathsToRevalidate: string[] = ["/", "/beaches"];
 
     // Add each beach page
     const bathingSitePaths = (await db.bathingSite.findMany({})).map(
