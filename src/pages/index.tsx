@@ -38,6 +38,7 @@ export default function Home({ stats }: HomeProps) {
           <Link
             className="flex items-center gap-3 rounded-lg border border-amber-300 bg-gradient-to-br from-amber-400 via-amber-300 to-amber-400 py-2 pl-5 pr-4 outline-2 outline-offset-2 outline-amber-500 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 hover:shadow-inner focus:outline-dashed md:py-3 lg:gap-3.5 lg:pl-6 lg:pr-5"
             href="/beaches"
+            disabled={true}
           >
             <span className="pt-0.5 text-lg font-semibold text-black md:pt-0 md:text-xl">
               Pick your beach
@@ -48,6 +49,10 @@ export default function Home({ stats }: HomeProps) {
             />
           </Link>
         </header>
+
+        <h2 className="text-lg font-medium text-amber-400">Sorry, Pompoo is down for maintenance</h2>
+        
+        {/**
         <section className="flex flex-wrap gap-6 text-lg font-medium text-white lg:gap-10">
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-amber-400">
@@ -68,6 +73,7 @@ export default function Home({ stats }: HomeProps) {
             <p>{stats.prettyDurationAllTime}</p>
           </div>
         </section>
+        **/}
       </main>
     </>
   );
